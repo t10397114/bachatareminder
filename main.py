@@ -99,13 +99,16 @@ async def scheduler(app):
             weekday = next_day.strftime("%A")
             print(f"[scheduler] now = {now}, next_day = {next_day}, weekday = {weekday}")
 
-            # ВРЕМЕННО:
-            if True:
-                for group in groups:
-                    if weekday in group["days"]:
-                        class_time = group["time"][weekday]
-                        await ask_admin(app, group, class_time)
-                await asyncio.sleep(180)
+            if now.hour == 18 and 50 <= now.minute <= 53:
+                if last_check_date != now.date():
+                    for group in groups:
+                        if weekday in group["days"]:
+                            class_time = group["time"][weekday]
+                            await ask_admin(app, group, class_time)
+                    last_check_date = now.date()
+                    await asyncio.sleep(180)
+                else:
+                    print("[scheduler] Уже спрашивали сегодня")
 
             await asyncio.sleep(20)
         except Exception as e:
