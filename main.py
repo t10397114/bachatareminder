@@ -133,9 +133,6 @@ async def main():
     await app.run_polling()
 
 if __name__ == "__main__":
-    import time
-    nest_asyncio.apply()
-
     async def full_run():
         asyncio.create_task(start_webserver())
         await main()
