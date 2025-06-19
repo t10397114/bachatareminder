@@ -99,7 +99,7 @@ async def scheduler(app):
             weekday = next_day.strftime("%A")
             print(f"[scheduler] now = {now}, next_day = {next_day}, weekday = {weekday}")
 
-            if now.hour == 17 and 7 <= now.minute <= 10:
+            if now.hour == 17 and 25 <= now.minute <= 27:
                 for group in groups:
                     if weekday in group["days"]:
                         class_time = group["time"][weekday]
