@@ -126,6 +126,7 @@ async def start_webserver():
 
 async def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
+    app.add_handler(MessageHandler(filters.ALL, show_chat_id))
     app.add_handler(CallbackQueryHandler(handle_callback))
     asyncio.create_task(scheduler(app))
     asyncio.create_task(start_webserver())  # запускаем веб-сервер параллельно
@@ -133,8 +134,6 @@ async def main():
 
 async def show_chat_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"Chat ID: {update.effective_chat.id}")
-
-app.add_handler(MessageHandler(filters.ALL, show_chat_id))
 
 if __name__ == "__main__":
     import time
