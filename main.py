@@ -128,8 +128,11 @@ async def start_webserver():
 def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CallbackQueryHandler(handle_callback))
-    asyncio.create_task(scheduler(app))
-    asyncio.create_task(start_webserver())
+
+    loop = asyncio.get_event_loop()
+    loop.create_task(scheduler(app))
+    loop.create_task(start_webserver())
+
     app.run_polling()
 
 if __name__ == "__main__":
