@@ -91,6 +91,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def scheduler(app):
     global last_check_date
+    print("[scheduler] запустился")
     while True:
         try:
             now_utc = datetime.datetime.utcnow()
@@ -111,6 +112,7 @@ async def scheduler(app):
         except Exception as e:
             logging.exception("Ошибка в scheduler")
             await asyncio.sleep(10)
+
 async def handle_ping(request):
     return web.Response(text="I'm alive!")
 
@@ -135,7 +137,7 @@ if __name__ == "__main__":
     nest_asyncio.apply()
 
     async def full_run():
-        await start_webserver()
+        asyncio.create_task(start_webserver())  # исправлено: теперь webserver в фоне
         await main()
 
     while True:
