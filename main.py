@@ -93,7 +93,7 @@ async def scheduler(app):
         try:
             now_utc = datetime.datetime.utcnow()
             now = now_utc + datetime.timedelta(hours=7)
-            if now.hour == 16 and 2 <= now.minute <= 6:
+            if now.hour == 16 and 49 <= now.minute <= 53:
                 if last_check_date != now.date():
                     next_day = now + datetime.timedelta(days=1)
                     weekday = next_day.strftime("%A")
@@ -121,9 +121,6 @@ async def start_webserver():
     site = web.TCPSite(runner, "0.0.0.0", port)
     await site.start()
 
-async def show_chat_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(f"Chat ID: {update.effective_chat.id}")
-
 async def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CallbackQueryHandler(handle_callback))
@@ -134,14 +131,13 @@ if __name__ == "__main__":
     import time
     nest_asyncio.apply()
 
-    try:
-        asyncio.run(start_webserver())  # запуск web-сервера ДО основного цикла
-    except Exception as e:
-        logging.exception("Ошибка при запуске web-сервера")
+    async def full_run():
+        await start_webserver()
+        await main()
 
     while True:
         try:
-            asyncio.run(main())
+            asyncio.run(full_run())
         except Exception as e:
             logging.exception("Бот упал с ошибкой. Перезапуск через 5 секунд...")
             time.sleep(5)
