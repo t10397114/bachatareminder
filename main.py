@@ -125,15 +125,12 @@ async def start_webserver():
     site = web.TCPSite(runner, "0.0.0.0", port)
     await site.start()
 
-async def main():
+def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CallbackQueryHandler(handle_callback))
     asyncio.create_task(scheduler(app))
-    await app.run_polling()
+    asyncio.create_task(start_webserver())
+    app.run_polling()
 
 if __name__ == "__main__":
-    async def full_run():
-        asyncio.create_task(start_webserver())
-        await main()
-
-    asyncio.run(full_run())
+    main()
