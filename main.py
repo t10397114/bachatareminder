@@ -93,15 +93,13 @@ async def scheduler(app):
         try:
             now_utc = datetime.datetime.utcnow()
             now = now_utc + datetime.timedelta(hours=7)
-            if now.hour == 16 and 49 <= now.minute <= 53:
-                if last_check_date != now.date():
-                    next_day = now + datetime.timedelta(days=1)
-                    weekday = next_day.strftime("%A")
-                    for group in groups:
-                        if weekday in group["days"]:
-                            class_time = group["time"][weekday]
-                            await ask_admin(app, group, class_time)
-                    last_check_date = now.date()
+            if now.hour == 17 and 7 <= now.minute <= 10:
+                next_day = now + datetime.timedelta(days=1)
+                weekday = next_day.strftime("%A")
+                for group in groups:
+                    if weekday in group["days"]:
+                        class_time = group["time"][weekday]
+                        await ask_admin(app, group, class_time)
                 await asyncio.sleep(180)
             await asyncio.sleep(20)
         except Exception as e:
