@@ -73,7 +73,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     weekday = next_day.strftime("%A")
     class_time = group["time"][weekday]
 
-     if action == "yes":
+    if action == "yes":
         await context.bot.send_poll(
             chat_id=group["chat_id"],
             question=f"Завтра '{group['name']}' в {class_time}. Кто придёт?",
