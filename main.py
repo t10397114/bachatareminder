@@ -119,6 +119,7 @@ async def start_webserver():
     runner = web.AppRunner(app)
     await runner.setup()
     port = int(os.environ.get("PORT", 8080))
+    print(f"[webserver] Starting on port {port}")
     site = web.TCPSite(runner, "0.0.0.0", port)
     await site.start()
 
@@ -130,12 +131,17 @@ async def main():
     app.add_handler(MessageHandler(filters.ALL, show_chat_id))  # временно для chat_id
     app.add_handler(CallbackQueryHandler(handle_callback))
     asyncio.create_task(scheduler(app))
-    asyncio.create_task(start_webserver())
     await app.run_polling()
 
 if __name__ == "__main__":
     import time
     nest_asyncio.apply()
+
+    try:
+        asyncio.run(start_webserver())  # запуск web-сервера ДО основного цикла
+    except Exception as e:
+        logging.exception("Ошибка при запуске web-сервера")
+
     while True:
         try:
             asyncio.run(main())
