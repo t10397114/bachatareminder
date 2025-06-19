@@ -99,17 +99,18 @@ async def scheduler(app):
             weekday = next_day.strftime("%A")
             print(f"[scheduler] now = {now}, next_day = {next_day}, weekday = {weekday}")
 
-            if now.hour == 17 and 25 <= now.minute <= 27:
+            # ВРЕМЕННО:
+            if True:
                 for group in groups:
                     if weekday in group["days"]:
                         class_time = group["time"][weekday]
                         await ask_admin(app, group, class_time)
                 await asyncio.sleep(180)
+
             await asyncio.sleep(20)
         except Exception as e:
             logging.exception("Ошибка в scheduler")
             await asyncio.sleep(10)
-
 async def handle_ping(request):
     return web.Response(text="I'm alive!")
 
