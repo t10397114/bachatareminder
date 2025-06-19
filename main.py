@@ -8,12 +8,13 @@ from telegram.ext import (
     ApplicationBuilder,
     ContextTypes,
     CallbackQueryHandler,
+    MessageHandler,
+    filters,
 )
-from telegram.ext import MessageHandler, filters
 import os
 
 logging.basicConfig(
-    filename="bot.log",  # сохраняет в файл
+    filename="bot.log",
     filemode="a",
     format="%(asctime)s - %(levelname)s - %(message)s",
     level=logging.INFO
@@ -25,13 +26,13 @@ ADMIN_ID = os.getenv("ADMIN_ID")
 # Список групп
 groups = [
     {
-        "name": "Бачата Нач. группа",
+        "name": "Бачата, нач. группа",
         "days": ["Monday", "Friday"],
         "time": {"Monday": "10:00", "Friday": "09:00"},
         "chat_id": os.getenv("CHAT_ID_BACHATA"),
     },
     {
-        "name": "Бачата Прод. группа",
+        "name": "Бачата прод. группа",
         "days": ["Monday", "Friday"],
         "time": {"Monday": "11:00", "Friday": "10:00"},
         "chat_id": os.getenv("CHAT_ID_BACHATA_ADV"),
@@ -39,6 +40,7 @@ groups = [
 ]
 
 pending = {}
+last_check_date = None
 
 def decision_keyboard(group_name):
     return InlineKeyboardMarkup([
@@ -50,7 +52,7 @@ def decision_keyboard(group_name):
 async def ask_admin(app, group, class_time):
     msg = await app.bot.send_message(
         chat_id=ADMIN_ID,
-        text=f"Завтра будет '{group['name']}' в {class_time}?",
+        text=f"Завтра будет занятие '{group['name']}' в {class_time}?",
         reply_markup=decision_keyboard(group['name'])
     )
     pending[msg.message_id] = group
@@ -71,7 +73,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if action == "yes":
         await context.bot.send_poll(
             chat_id=group["chat_id"],
-            question=f"Завтра '{group['name']}' в {class_time}. Кто придёт?",
+            question=f"Завтра занятие '{group['name']}' в {class_time}. Кто придёт?",
             options=["✅ Приду", "❌ Не приду"],
             is_anonymous=False,
         )
@@ -86,12 +88,9 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif action == "skip":
         await query.edit_message_text("Хорошо, сообщение не отправлено 🚫")
-    pass
-    
-async def scheduler(app):
-    await asyncio.sleep(30)  # даём Render время на перезапуск
-    last_check = None
 
+async def scheduler(app):
+    global last_check_date
     while True:
         try:
             now_utc = datetime.datetime.utcnow()
@@ -111,8 +110,6 @@ async def scheduler(app):
             logging.exception("Ошибка в scheduler")
             await asyncio.sleep(10)
 
-
-# Простенький aiohttp сервер для пинга uptime robot
 async def handle_ping(request):
     return web.Response(text="I'm alive!")
 
@@ -125,16 +122,16 @@ async def start_webserver():
     site = web.TCPSite(runner, "0.0.0.0", port)
     await site.start()
 
-async def main():
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
-    app.add_handler(MessageHandler(filters.ALL, show_chat_id))
-    app.add_handler(CallbackQueryHandler(handle_callback))
-    asyncio.create_task(scheduler(app))
-    asyncio.create_task(start_webserver())  # запускаем веб-сервер параллельно
-    await app.run_polling()
-
 async def show_chat_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"Chat ID: {update.effective_chat.id}")
+
+async def main():
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    app.add_handler(MessageHandler(filters.ALL, show_chat_id))  # временно для chat_id
+    app.add_handler(CallbackQueryHandler(handle_callback))
+    asyncio.create_task(scheduler(app))
+    asyncio.create_task(start_webserver())
+    await app.run_polling()
 
 if __name__ == "__main__":
     import time
