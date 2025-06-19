@@ -22,11 +22,6 @@ logging.basicConfig(
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = os.getenv("ADMIN_ID")
 
-async def show_chat_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(f"Chat ID: {update.effective_chat.id}")
-
-app.add_handler(MessageHandler(filters.ALL, show_chat_id))
-
 # Список групп
 groups = [
     {
@@ -136,6 +131,10 @@ async def main():
     asyncio.create_task(start_webserver())  # запускаем веб-сервер параллельно
     await app.run_polling()
 
+async def show_chat_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(f"Chat ID: {update.effective_chat.id}")
+
+app.add_handler(MessageHandler(filters.ALL, show_chat_id))
 
 if __name__ == "__main__":
     import time
