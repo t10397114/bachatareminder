@@ -137,12 +137,7 @@ if __name__ == "__main__":
     nest_asyncio.apply()
 
     async def full_run():
-        asyncio.create_task(start_webserver())  # исправлено: теперь webserver в фоне
+        asyncio.create_task(start_webserver())
         await main()
 
-    while True:
-        try:
-            asyncio.run(full_run())
-        except Exception as e:
-            logging.exception("Бот упал с ошибкой. Перезапуск через 5 секунд...")
-            time.sleep(5)
+    asyncio.run(full_run())
