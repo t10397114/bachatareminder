@@ -48,6 +48,8 @@ def decision_keyboard(group_name):
     ])
 
 async def ask_admin(app, group, class_time):
+    print(f"[ask_admin] Спрашиваем про: {group['name']}, чат: {group['chat_id']}")
+    print(f"[ask_admin] ADMIN_ID: {ADMIN_ID}")
     msg = await app.bot.send_message(
         chat_id=ADMIN_ID,
         text=f"Завтра будет занятие '{group['name']}' в {class_time}?",
@@ -93,9 +95,11 @@ async def scheduler(app):
         try:
             now_utc = datetime.datetime.utcnow()
             now = now_utc + datetime.timedelta(hours=7)
+            next_day = now + datetime.timedelta(days=1)
+            weekday = next_day.strftime("%A")
+            print(f"[scheduler] now = {now}, next_day = {next_day}, weekday = {weekday}")
+
             if now.hour == 17 and 7 <= now.minute <= 10:
-                next_day = now + datetime.timedelta(days=1)
-                weekday = next_day.strftime("%A")
                 for group in groups:
                     if weekday in group["days"]:
                         class_time = group["time"][weekday]
