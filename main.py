@@ -8,8 +8,6 @@ from telegram.ext import (
     ApplicationBuilder,
     ContextTypes,
     CallbackQueryHandler,
-    MessageHandler,
-    filters,
 )
 import os
 
@@ -95,7 +93,7 @@ async def scheduler(app):
         try:
             now_utc = datetime.datetime.utcnow()
             now = now_utc + datetime.timedelta(hours=7)
-            if now.hour == 12 and 0 <= now.minute <= 3:
+            if now.hour == 16 and 2 <= now.minute <= 6:
                 if last_check_date != now.date():
                     next_day = now + datetime.timedelta(days=1)
                     weekday = next_day.strftime("%A")
@@ -128,7 +126,6 @@ async def show_chat_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
-    app.add_handler(MessageHandler(filters.ALL, show_chat_id))  # временно для chat_id
     app.add_handler(CallbackQueryHandler(handle_callback))
     asyncio.create_task(scheduler(app))
     await app.run_polling()
