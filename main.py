@@ -51,7 +51,7 @@ async def ask_admin(app, group, class_time):
     print(f"[ask_admin] ADMIN_ID: {ADMIN_ID}")
     msg = await app.bot.send_message(
         chat_id=ADMIN_ID,
-        text=f"Завтра будет занятие '{group['name']}' в {class_time}?",
+        text=f"Завтра будет '{group['name']}' в {class_time}?",
         reply_markup=decision_keyboard(group['name'])
     )
     pending[msg.message_id] = group
@@ -72,7 +72,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if action == "yes":
         await context.bot.send_poll(
             chat_id=group["chat_id"],
-            question=f"Завтра занятие '{group['name']}' в {class_time}. Кто придёт?",
+            question=f"Завтра бачата в {class_time}. Кто придёт?",
             options=["✅ Приду", "❌ Не приду"],
             is_anonymous=False,
         )
