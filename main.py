@@ -34,6 +34,30 @@ groups = [
         "time": {"Monday": "11:00", "Friday": "10:00"},
         "chat_id": os.getenv("CHAT_ID_BACHATA_ADV"),
     },
+    {
+        "name": "Solo latina",
+        "days": ["Monday", "Thursday"],
+        "time": {"Monday": "09:00", "Thursday": "12:00"},
+        "chat_id": os.getenv("CHAT_ID_SOLO_LATINA"),
+    },
+    {
+        "name": "Малыши 3-5 лет",
+        "days": ["Tuesday", "Thursday"],
+        "time": {"Tuesday": "19:00", "Thursday": "19:00"},
+        "chat_id": os.getenv("CHAT_ID_KIDS_3_5"),
+    },
+    {
+        "name": "Малыши 5-6 лет",
+        "days": ["Monday", "Thursday"],
+        "time": {"Monday": "17:00", "Thursday": "17:00"},
+        "chat_id": os.getenv("CHAT_ID_KIDS_5_6"),
+    },
+    {
+        "name": "Пары 7-13 лет",
+        "days": ["Monday", "Thursday"],
+        "time": {"Monday": "19:00", "Thursday": "18:00"},
+        "chat_id": os.getenv("CHAT_ID_MIAMI_PAIRS"),
+    },
 ]
 
 pending = {}
@@ -51,7 +75,7 @@ async def ask_admin(app, group, class_time):
     print(f"[ask_admin] ADMIN_ID: {ADMIN_ID}")
     msg = await app.bot.send_message(
         chat_id=ADMIN_ID,
-        text=f"Завтра будет '{group['name']}' в {class_time}?",
+        text=f"Завтра будет занятие '{group['name']}' в {class_time}?",
         reply_markup=decision_keyboard(group['name'])
     )
     pending[msg.message_id] = group
@@ -72,7 +96,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if action == "yes":
         await context.bot.send_poll(
             chat_id=group["chat_id"],
-            question=f"Завтра бачата в {class_time}. Кто придёт?",
+            question=f"Завтра занятие '{group['name']}' в {class_time}. Кто придёт?",
             options=["✅ Приду", "❌ Не приду"],
             is_anonymous=False,
         )
@@ -81,7 +105,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif action == "no":
         await context.bot.send_message(
             chat_id=group["chat_id"],
-            text="Ребята, завтра занятия не будет!"
+            text="Всем привет, завтра занятия не будет!"
         )
         await query.edit_message_text("Отмена отправлена ❌")
 
@@ -99,7 +123,7 @@ async def scheduler(app):
             weekday = next_day.strftime("%A")
             print(f"[scheduler] now = {now}, next_day = {next_day}, weekday = {weekday}")
 
-            if now.hour == 18 and 50 <= now.minute <= 53:
+            if now.hour == 13 and 15 <= now.minute <= 18:
                 if last_check_date != now.date():
                     for group in groups:
                         if weekday in group["days"]:
