@@ -113,11 +113,6 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif action == "skip":
         await query.edit_message_text("Хорошо, сообщение не отправлено 🚫")
 
-async def show_chat_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat_id = update.effective_chat.id
-    print(f"[chat_id] Получен chat_id: {chat_id}", flush=True)
-    await update.message.reply_text(f"🔍 Chat ID этой группы: `{chat_id}`", parse_mode="Markdown")
-
 async def scheduler(app):
     global last_check_date
     print("[scheduler] запустился")
@@ -129,7 +124,7 @@ async def scheduler(app):
             weekday = next_day.strftime("%A")
             print(f"[scheduler] now = {now}, next_day = {next_day}, weekday = {weekday}")
 
-            if now.hour == 18 and 15 <= now.minute <= 18:
+            if now.hour == 18 and 1 <= now.minute <= 4:
                 if last_check_date != now.date():
                     for group in groups:
                         if weekday in group["days"]:
@@ -161,8 +156,6 @@ async def start_webserver():
 def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CallbackQueryHandler(handle_callback))
-    from telegram.ext import MessageHandler, filters
-    app.add_handler(MessageHandler(filters.ALL, show_chat_id))  # временно
 
     loop = asyncio.get_event_loop()
     loop.create_task(scheduler(app))
