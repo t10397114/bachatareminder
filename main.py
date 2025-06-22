@@ -113,16 +113,10 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif action == "skip":
         await query.edit_message_text("Хорошо, сообщение не отправлено 🚫")
 
-async def activate_bot(app):
-    for group in groups:
-        try:
-            await app.bot.send_message(
-                chat_id=group["chat_id"],
-                text=f"👋 Привет! Это тестовое сообщение для активации в группе: {group['name']}"
-            )
-            print(f"[activate_bot] Успешно отправлено в: {group['name']}", flush=True)
-        except Exception as e:
-            print(f"[activate_bot] Не удалось отправить в {group['name']}: {e}", flush=True)
+async def show_chat_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat_id = update.effective_chat.id
+    print(f"[chat_id] Получен chat_id: {chat_id}", flush=True)
+    await update.message.reply_text(f"🔍 Chat ID этой группы: `{chat_id}`", parse_mode="Markdown")
 
 async def scheduler(app):
     global last_check_date
@@ -167,11 +161,12 @@ async def start_webserver():
 def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CallbackQueryHandler(handle_callback))
+    from telegram.ext import MessageHandler, filters
+    app.add_handler(MessageHandler(filters.ALL, show_chat_id))  # временно
 
     loop = asyncio.get_event_loop()
     loop.create_task(scheduler(app))
     loop.create_task(start_webserver())
-    loop.create_task(activate_bot(app))  # 👈 запускаем разовую проверку связи с группами
 
     app.run_polling()
 
