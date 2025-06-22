@@ -94,7 +94,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     class_time = group["time"][weekday]
 
     if action == "yes":
-        print(f\"[callback] отправляем опрос в: {group['name']}, чат: {group['chat_id']}\")
+        print(f"[callback] отправляем опрос в: {group['name']}, чат: {group['chat_id']}")
         await context.bot.send_poll(
             chat_id=group["chat_id"],
             question=f"Всем привет! Завтра занятие в {class_time}. Кто придёт?",
@@ -124,7 +124,7 @@ async def scheduler(app):
             weekday = next_day.strftime("%A")
             print(f"[scheduler] now = {now}, next_day = {next_day}, weekday = {weekday}")
 
-            if now.hour == 17 and 33 <= now.minute <= 36:
+            if now.hour == 17 and 43 <= now.minute <= 46:
                 if last_check_date != now.date():
                     for group in groups:
                         if weekday in group["days"]:
