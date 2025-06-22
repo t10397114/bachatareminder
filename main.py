@@ -113,6 +113,17 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif action == "skip":
         await query.edit_message_text("Хорошо, сообщение не отправлено 🚫")
 
+async def activate_bot(app):
+    for group in groups:
+        try:
+            await app.bot.send_message(
+                chat_id=group["chat_id"],
+                text=f"👋 Привет! Это тестовое сообщение для активации в группе: {group['name']}"
+            )
+            print(f"[activate_bot] Успешно отправлено в: {group['name']}", flush=True)
+        except Exception as e:
+            print(f"[activate_bot] Не удалось отправить в {group['name']}: {e}", flush=True)
+
 async def scheduler(app):
     global last_check_date
     print("[scheduler] запустился")
@@ -124,7 +135,7 @@ async def scheduler(app):
             weekday = next_day.strftime("%A")
             print(f"[scheduler] now = {now}, next_day = {next_day}, weekday = {weekday}")
 
-            if now.hour == 18 and 1 <= now.minute <= 4:
+            if now.hour == 18 and 15 <= now.minute <= 18:
                 if last_check_date != now.date():
                     for group in groups:
                         if weekday in group["days"]:
@@ -160,6 +171,7 @@ def main():
     loop = asyncio.get_event_loop()
     loop.create_task(scheduler(app))
     loop.create_task(start_webserver())
+    loop.create_task(activate_bot(app))  # 👈 запускаем разовую проверку связи с группами
 
     app.run_polling()
 
