@@ -27,36 +27,42 @@ groups = [
         "days": ["Monday", "Friday"],
         "time": {"Monday": "10:00", "Friday": "09:00"},
         "chat_id": os.getenv("CHAT_ID_BACHATA"),
+        "ask_day": "before",  # спрашиваем за день до
     },
     {
         "name": "Бачата продолжающ. группа",
         "days": ["Monday", "Friday"],
         "time": {"Monday": "11:00", "Friday": "10:00"},
         "chat_id": os.getenv("CHAT_ID_BACHATA_ADV"),
+        "ask_day": "before",  # спрашиваем за день до
     },
     {
         "name": "Solo latina",
         "days": ["Monday", "Thursday"],
         "time": {"Monday": "09:00", "Thursday": "12:00"},
         "chat_id": os.getenv("CHAT_ID_SOLO_LATINA"),
+        "ask_day": "before",  # спрашиваем за день до
     },
     {
         "name": "Малыши 3-5 лет",
         "days": ["Tuesday", "Thursday"],
         "time": {"Tuesday": "19:00", "Thursday": "19:00"},
         "chat_id": os.getenv("CHAT_ID_KIDS_3_5"),
+        "ask_day": "same",  # спрашиваем в тот же день
     },
     {
         "name": "Малыши 5-6 лет",
         "days": ["Monday", "Thursday"],
         "time": {"Monday": "17:00", "Thursday": "17:00"},
         "chat_id": os.getenv("CHAT_ID_KIDS_5_6"),
+        "ask_day": "same",  # спрашиваем в тот же день
     },
     {
         "name": "Пары 7-13 лет",
         "days": ["Monday", "Thursday"],
         "time": {"Monday": "19:00", "Thursday": "18:00"},
         "chat_id": os.getenv("CHAT_ID_MIAMI_PAIRS"),
+        "ask_day": "same",  # спрашиваем в тот же день
     },
 ]
 
@@ -113,27 +119,53 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif action == "skip":
         await query.edit_message_text("Хорошо, сообщение не отправлено 🚫")
 
+async def show_chat_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat_id = update.effective_chat.id
+    print(f"[chat_id] Получен chat_id: {chat_id}", flush=True)
+    await update.message.reply_text(f"🔍 Chat ID этой группы: `{chat_id}`", parse_mode="Markdown")
+
 async def scheduler(app):
     global last_check_date
     print("[scheduler] запустился")
+    already_asked = set()
+
     while True:
         try:
             now_utc = datetime.datetime.utcnow()
             now = now_utc + datetime.timedelta(hours=7)
-            next_day = now + datetime.timedelta(days=1)
-            weekday = next_day.strftime("%A")
-            print(f"[scheduler] now = {now}, next_day = {next_day}, weekday = {weekday}")
+            print(f"[scheduler] now = {now}")
 
-            if now.hour == 18 and 1 <= now.minute <= 4:
-                if last_check_date != now.date():
-                    for group in groups:
-                        if weekday in group["days"]:
-                            class_time = group["time"][weekday]
-                            await ask_admin(app, group, class_time)
-                    last_check_date = now.date()
-                    await asyncio.sleep(180)
-                else:
-                    print("[scheduler] Уже спрашивали сегодня")
+            # Проверка для "before" групп — в 13:00, спрашиваем про завтра
+            if now.hour == 13 and 0 <= now.minute <= 4 and "before" not in already_asked:
+                target_day = now + datetime.timedelta(days=1)
+                weekday = target_day.strftime("%A")
+                print(f"[scheduler] Проверяем группы на завтра ({weekday})")
+
+                for group in groups:
+                    if group.get("ask_day") == "before" and weekday in group["days"]:
+                        class_time = group["time"][weekday]
+                        await ask_admin(app, group, class_time)
+
+                already_asked.add("before")
+                print("[scheduler] Спросили 'before' группы")
+
+            # Проверка для "same" групп — в 11:00, спрашиваем про сегодня
+            if now.hour == 11 and 0 <= now.minute <= 4 and "same" not in already_asked:
+                weekday = now.strftime("%A")
+                print(f"[scheduler] Проверяем группы на сегодня ({weekday})")
+
+                for group in groups:
+                    if group.get("ask_day") == "same" and weekday in group["days"]:
+                        class_time = group["time"][weekday]
+                        await ask_admin(app, group, class_time)
+
+                already_asked.add("same")
+                print("[scheduler] Спросили 'same' группы")
+
+            # Сброс флага на следующий день
+            if now.hour == 0 and now.minute < 5:
+                already_asked.clear()
+                print("[scheduler] Обнуление already_asked для нового дня")
 
             await asyncio.sleep(20)
         except Exception as e:
@@ -156,6 +188,8 @@ async def start_webserver():
 def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CallbackQueryHandler(handle_callback))
+    from telegram.ext import MessageHandler, filters
+    app.add_handler(MessageHandler(filters.ALL, show_chat_id))  # временно
 
     loop = asyncio.get_event_loop()
     loop.create_task(scheduler(app))
