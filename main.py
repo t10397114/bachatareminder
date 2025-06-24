@@ -77,15 +77,21 @@ def decision_keyboard(group_name):
     ])
 
 async def ask_admin(app, group, class_time):
-    print(f"[ask_admin] Спрашиваем про: {group['name']}, чат: {group['chat_id']}",flush=True)
-    print(f"[ask_admin] ADMIN_ID: {ADMIN_ID}",flush=True)
+    print(f"[ask_admin] Спрашиваем про: {group['name']}, чат: {group['chat_id']}", flush=True)
+    print(f"[ask_admin] ADMIN_ID: {ADMIN_ID}", flush=True)
+
+    if group["ask_day"] == "before":
+        text = f"Завтра будет занятие '{group['name']}' в {class_time}?"
+    else:
+        text = f"Сегодня будет занятие '{group['name']}' в {class_time}?"
+
     msg = await app.bot.send_message(
         chat_id=ADMIN_ID,
-        text=f"Завтра будет занятие '{group['name']}' в {class_time}?",
+        text=text,
         reply_markup=decision_keyboard(group['name'])
     )
     pending[msg.message_id] = group
-
+    
 async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -112,7 +118,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif action == "no":
         await context.bot.send_message(
             chat_id=group["chat_id"],
-            text="Всем привет, завтра занятия не будет!"
+            text="Всем привет, завтра занятия в {class_time} не будет!"
         )
         await query.edit_message_text("Отмена отправлена ❌")
 
@@ -145,7 +151,7 @@ async def scheduler(app):
                 print("[scheduler] Спросили 'before' группы")
 
             # Проверка для "same" групп — в 11:00, спрашиваем про сегодня
-            if now.hour == 11 and 0 <= now.minute <= 4 and "same" not in already_asked:
+            if now.hour == 13 and 29 <= now.minute <= 34 and "same" not in already_asked:
                 weekday = now.strftime("%A")
                 print(f"[scheduler] Проверяем группы на сегодня ({weekday})")
 
