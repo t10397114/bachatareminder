@@ -204,7 +204,6 @@ def main():
     loop = asyncio.get_event_loop()
     loop.create_task(scheduler(app))
     loop.create_task(start_webserver())
-    loop.create_task(activate_bot(app))
 
     app.run_polling()
 
