@@ -3,13 +3,6 @@ import os
 
 from pytz import timezone
 
-logging.basicConfig(
-    filename="bot.log",
-    filemode="a",
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    level=logging.INFO,
-)
-
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = os.getenv("ADMIN_ID")
 
@@ -19,6 +12,14 @@ SCHEDULE_SAME_HOUR = os.getenv("SCHEDULE_SAME_HOUR")
 SCHEDULE_SAME_MINUTE = os.getenv("SCHEDULE_SAME_MINUTE")
 
 TIMEZONE = timezone("Asia/Novosibirsk")
+
+logging.basicConfig(
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    level=logging.INFO
+)
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
+logger = logging.getLogger(__name__)
 
 GROUPS = [
     {
@@ -66,8 +67,8 @@ GROUPS = [
     # для тестирования
     # {
     #     "name": "Test before",
-    #     "days": ["Monday", "Friday"],
-    #     "time": {"Monday": "10:00", "Friday": "09:00"},
+    #     "days": ["Tuesday", "Friday"],
+    #     "time": {"Tuesday": "10:00", "Friday": "09:00"},
     #     "chat_id": "-1002837893273",
     #     "ask_day": "before",  # спрашиваем за день до
     # },

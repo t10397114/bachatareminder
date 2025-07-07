@@ -10,6 +10,7 @@ from config import (
     SCHEDULE_SAME_HOUR,
     SCHEDULE_SAME_MINUTE,
     TIMEZONE,
+    logger,
 )
 from tg_service import ask_admin
 
@@ -19,7 +20,7 @@ async def ask_before_groups():
     now = datetime.now(TIMEZONE)
     target_day = now + timedelta(days=1)
     weekday = target_day.strftime("%A")
-    print(f"[ask_before_groups] Проверяем группы на завтра ({weekday})")
+    logger.info(f"[ask_before_groups] Проверяем группы на завтра ({weekday})")
 
     for group in GROUPS:
         if group.get("ask_day") == "before" and weekday in group["days"]:
@@ -29,7 +30,7 @@ async def ask_before_groups():
 async def ask_same_day_groups():
     now = datetime.now(TIMEZONE)
     weekday = now.strftime("%A")
-    print(f"[ask_same_day_groups] Проверяем группы на сегодня ({weekday})")
+    logger.info(f"[ask_same_day_groups] Проверяем группы на сегодня ({weekday})")
 
     for group in GROUPS:
         if group.get("ask_day") == "same" and weekday in group["days"]:
@@ -51,4 +52,4 @@ async def setup_scheduler():
         replace_existing=True,
     )
     scheduler.start()
-    print("[scheduler] Started with APScheduler")
+    logger.info("[scheduler] Started with APScheduler")

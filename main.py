@@ -7,11 +7,12 @@ from telegram.ext import (
 )
 
 from bot import app
+from config import logger
 from scheduler import setup_scheduler
 from tg_service import handle_callback
 
 
-async def handle_ping(request):
+async def handle_ping(_):
     return web.Response(text="I'm alive!")
 
 
@@ -21,7 +22,7 @@ async def start_webserver():
     runner = web.AppRunner(app)
     await runner.setup()
     port = int(os.environ.get("PORT", 8080))
-    print(f"[webserver] Starting on port {port}")
+    logger.info(f"[webserver] Starting on port {port}")
     site = web.TCPSite(runner, "0.0.0.0", port)
     await site.start()
 
@@ -35,4 +36,5 @@ def main():
     app.run_polling()
 
 if __name__ == "__main__":
+    logger.info(f"Вызов main")
     main()
