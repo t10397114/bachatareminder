@@ -7,7 +7,7 @@ from telegram.ext import (
 )
 
 from bot import app
-from scheduler import setup_scheduler
+from scheduler import scheduler
 from tg_service import handle_callback
 
 
@@ -28,7 +28,7 @@ async def start_webserver():
 
 def main():
     loop = asyncio.get_event_loop()
-    loop.create_task(setup_scheduler())
+    loop.create_task(scheduler())
     loop.create_task(start_webserver())
 
     app.add_handler(CallbackQueryHandler(handle_callback))
