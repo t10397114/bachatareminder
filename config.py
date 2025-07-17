@@ -25,14 +25,14 @@ GROUPS = [
     {
         "name": "Бачата, начинашки",
         "days": ["Monday", "Friday"],
-        "time": {"Monday": "10:00", "Friday": "09:00"},
+        "time": {"Monday": "10:00", "Friday": "10:00"},
         "chat_id": os.getenv("CHAT_ID_BACHATA"),
         "ask_day": "before",  # спрашиваем за день до
     },
     {
         "name": "Бачата продолжающ. группа",
         "days": ["Monday", "Friday"],
-        "time": {"Monday": "11:00", "Friday": "10:00"},
+        "time": {"Monday": "10:00", "Friday": "10:00"},
         "chat_id": os.getenv("CHAT_ID_BACHATA_ADV"),
         "ask_day": "before",  # спрашиваем за день до
     },
