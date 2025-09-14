@@ -39,9 +39,7 @@ GROUPS = [
     {
         "name": "Solo latina",
         "days": ["Monday", "Thursday"],
-        "time": {"Monday": "09:00", "Thursday": "12:00"},
-        "chat_id": os.getenv("CHAT_ID_SOLO_LATINA"),
-        "ask_day": "before",  # спрашиваем за день до
+        "time": {"Monday": "11:00", "Thursday": "12:00"},
     },
     {
         "name": "Малыши 3-5 лет",
@@ -59,8 +57,8 @@ GROUPS = [
     },
     {
         "name": "Пары 7-13 лет",
-        "days": ["Monday", "Thursday"],
-        "time": {"Monday": "19:00", "Thursday": "18:00"},
+        "days": ["Monday", "Thursday", "Friday"],
+        "time": {"Monday": "19:00", "Thursday": "18:00", "Friday": "16:00"},
         "chat_id": os.getenv("CHAT_ID_MIAMI_PAIRS"),
         "ask_day": "same",  # спрашиваем в тот же день
     },
