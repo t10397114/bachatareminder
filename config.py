@@ -58,7 +58,7 @@ GROUPS = [
     {
         "name": "Пары 7-13 лет",
         "days": ["Monday", "Thursday", "Friday"],
-        "time": {"Monday": "19:00", "Thursday": "18:00", "Friday": "16:00"},
+        "time": {"Monday": "18:00", "Thursday": "18:00", "Friday": "16:00"},
         "chat_id": os.getenv("CHAT_ID_MIAMI_PAIRS"),
         "ask_day": "same",  # спрашиваем в тот же день
     },
