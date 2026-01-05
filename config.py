@@ -38,8 +38,10 @@ GROUPS = [
     },
     {
         "name": "Solo latina",
-        "days": ["Monday", "Thursday"],
-        "time": {"Monday": "11:00", "Thursday": "12:00"},
+        "days": ["Monday", "Friday"],
+        "time": {"Monday": "09:00", "Friday": "09:00"},
+        "chat_id": os.getenv("CHAT_ID_SOLO_LATINA"),
+        "ask_day": "before",  # спрашиваем за день до
     },
     {
         "name": "Малыши 3-5 лет",
